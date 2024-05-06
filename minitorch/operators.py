@@ -132,13 +132,16 @@ def map(fn: Callable[[float], float]) -> Callable[[Iterable[float]], Iterable[fl
          new list
     """
 
-    def apply(ls: Iterable[float]):
-        new_ls = []
-        for each in ls:
-            new_ls += [fn(each)]
-        return new_ls
+    def g(ls: Iterable[float], acc: Iterable[float]):
+        if ls == []:
+            return acc
+        x, *rest = ls
+        return g(rest, acc + [fn(x)])
 
-    return apply
+    def f(ls: Iterable[float]):
+        return g(ls, [])
+
+    return f
 
 
 def negList(ls: Iterable[float]) -> Iterable[float]:
@@ -163,14 +166,17 @@ def zipWith(
 
     """
 
-    def apply(ls1: Iterable[float], ls2: Iterable[float]):
-        new_ls = []
-        for i in range(len(ls1)):
-            x, y = ls1[i], ls2[i]
-            new_ls.append(fn(x, y))
-        return new_ls
+    def g(ls1: Iterable[float], ls2: Iterable[float], acc: Iterable[float]):
+        if ls1 == []:
+            return acc
+        x, *xs = ls1
+        y, *ys = ls2
+        return g(xs, ys, acc + [fn(x, y)])
 
-    return apply
+    def f(ls1: Iterable[float], ls2: Iterable[float]):
+        return g(ls1, ls2, [])
+
+    return f
 
 
 def addLists(ls1: Iterable[float], ls2: Iterable[float]) -> Iterable[float]:
@@ -194,13 +200,16 @@ def reduce(
          fn(x_1, x_0)))`
     """
 
-    def apply(ls: Iterable[float]):
-        acc = start
-        for each in ls:
-            acc = fn(acc, each)
-        return acc
+    def g(ls: Iterable[float], acc: float):
+        if ls == []:
+            return acc
+        x, *xs = ls
+        return g(xs, fn(acc, x))
 
-    return apply
+    def f(ls: Iterable[float]):
+        return g(ls, start)
+
+    return f
 
 
 def sum(ls: Iterable[float]) -> float:

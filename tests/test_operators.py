@@ -119,7 +119,7 @@ def test_sigmoid(a: float) -> None:
 def test_transitive(a: float, b: float, c: float) -> None:
     "Test the transitive property of less-than (a < b and b < c implies a < c)"
     if a < b and b < c:
-        assert lt(a, b) and lt(b, c) == lt(a, c)
+        assert lt(a, b) == lt(b, c) == lt(a, c)
 
 
 @pytest.mark.task0_2
@@ -181,7 +181,7 @@ def test_sum_distribute(ls1: List[float], ls2: List[float]) -> None:
     """
     left = add(sum(ls1), sum(ls2))
     right = sum(addLists(ls1, ls2))
-    assert abs(left - right) < EPS
+    assert_close(left, right)
 
 
 @pytest.mark.task0_3
