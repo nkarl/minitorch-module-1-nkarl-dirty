@@ -132,13 +132,13 @@ def map(fn: Callable[[float], float]) -> Callable[[Iterable[float]], Iterable[fl
          new list
     """
 
-    def g(ls: Iterable[float], acc: Iterable[float]):
-        if ls == []:
-            return acc
-        x, *rest = ls
-        return g(rest, acc + [fn(x)])
-
     def f(ls: Iterable[float]):
+        def g(ls: Iterable[float], acc: Iterable[float]):
+            if ls == []:
+                return acc
+            x, *rest = ls
+            return g(rest, acc + [fn(x)])
+
         return g(ls, [])
 
     return f
@@ -166,22 +166,25 @@ def zipWith(
 
     """
 
-    def g(ls1: Iterable[float], ls2: Iterable[float], acc: Iterable[float]):
-        if ls1 == []:
-            return acc
-        x, *xs = ls1
-        y, *ys = ls2
-        return g(xs, ys, acc + [fn(x, y)])
+    def f(ls1: Iterable[float]):
+        def g(ls2: Iterable[float]):
+            def h(ls1: Iterable[float], ls2: Iterable[float], acc: Iterable[float]):
+                if ls1 == []:
+                    return acc
+                x, *xs = ls1
+                y, *ys = ls2
+                return h(xs, ys, acc + [fn(x, y)])
 
-    def f(ls1: Iterable[float], ls2: Iterable[float]):
-        return g(ls1, ls2, [])
+            return h(ls1, ls2, [])
+
+        return g
 
     return f
 
 
 def addLists(ls1: Iterable[float], ls2: Iterable[float]) -> Iterable[float]:
     "Add the elements of `ls1` and `ls2` using `zipWith` and `add`"
-    return zipWith(add)(ls1, ls2)
+    return zipWith(add)(ls1)(ls2)
 
 
 def reduce(
@@ -200,13 +203,13 @@ def reduce(
          fn(x_1, x_0)))`
     """
 
-    def g(ls: Iterable[float], acc: float):
-        if ls == []:
-            return acc
-        x, *xs = ls
-        return g(xs, fn(acc, x))
-
     def f(ls: Iterable[float]):
+        def g(ls: Iterable[float], acc: float):
+            if ls == []:
+                return acc
+            x, *xs = ls
+            return g(xs, fn(acc, x))
+
         return g(ls, start)
 
     return f
