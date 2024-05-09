@@ -62,10 +62,10 @@ def sigmoid(x: float) -> float:
 
     for stability.
     """
-    # sig_pos = 1.0 / (1.0 + math.exp(neg(x)))
-    # sig_neg = math.exp(x) / (1.0 + math.exp(x))
-    # return sig_pos if x >= 0 else sig_neg
-    return 1.0 / (1.0 + math.exp(neg(x)))
+    if x >= 0:
+        return 1.0 / (1.0 + math.exp(neg(x)))
+    else:
+        return math.exp(x) / (1.0 + math.exp(x))
 
 
 def relu(x: float) -> float:
