@@ -33,6 +33,7 @@ class Module:
         module.training = training
         for each in module.modules():
             self._propagate(each, training)
+        return True
 
     def train(self) -> None:
         "Set the mode of this module and all descendent modules to `train`."
@@ -51,7 +52,7 @@ class Module:
             The name and `Parameter` of each ancestor parameter.
         """
 
-        def _named_parameters(module, prefix=""):
+        def _named_parameters(module: Module, prefix: str = "") -> Any:
             for name, param in module._parameters.items():
                 yield prefix + name, param
             for name, module in module._modules.items():
@@ -97,7 +98,7 @@ class Module:
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         return self.forward(*args, **kwargs)
 
-    def forward(self):
+    def forward(self) -> None:
         assert False, "Not Implemented"
 
     def __repr__(self) -> str:

@@ -6,6 +6,7 @@ from hypothesis.strategies import lists
 
 from minitorch import MathTest
 from minitorch.operators import (
+    EPS,
     add,
     addLists,
     eq,
@@ -23,7 +24,6 @@ from minitorch.operators import (
     relu_back,
     sigmoid,
     sum,
-    EPS,
 )
 
 from .strategies import assert_close, small_floats

@@ -3,7 +3,7 @@ Collection of the core mathematical operators used throughout the code base.
 """
 
 import math
-from typing import Callable, Iterable
+from typing import Callable, Iterable, List  # , Sequence
 
 # ## Task 0.1
 #
@@ -132,12 +132,13 @@ def map(fn: Callable[[float], float]) -> Callable[[Iterable[float]], Iterable[fl
          new list
     """
 
-    def f(ls: Iterable[float]):
-        def g(ls: Iterable[float], acc: Iterable[float]):
+    def f(ls: Iterable[float]) -> List[float]:
+        def g(ls: Iterable[float], acc: List[float]) -> List[float]:
             if ls == []:
                 return acc
             x, *rest = ls
-            return g(rest, acc + [fn(x)])
+            acc += [fn(x)]
+            return g(rest, acc)
 
         return g(ls, [])
 
@@ -151,7 +152,7 @@ def negList(ls: Iterable[float]) -> Iterable[float]:
 
 def zipWith(
     fn: Callable[[float, float], float],
-) -> Callable[[Iterable[float], Iterable[float]], Iterable[float]]:
+) -> Callable[[Iterable[float]], Callable[[Iterable[float]], List[float]]]:
     """
     Higher-order zipwith (or map2).
 
@@ -166,9 +167,13 @@ def zipWith(
 
     """
 
-    def f(ls1: Iterable[float]):
-        def g(ls2: Iterable[float]):
-            def h(ls1: Iterable[float], ls2: Iterable[float], acc: Iterable[float]):
+    def f(ls1: Iterable[float]) -> Callable[[Iterable[float]], List[float]]:
+        def g(
+            ls2: Iterable[float],
+        ) -> List[float]:
+            def h(
+                ls1: Iterable[float], ls2: Iterable[float], acc: List[float]
+            ) -> List[float]:
                 if ls1 == []:
                     return acc
                 x, *xs = ls1
@@ -182,7 +187,7 @@ def zipWith(
     return f
 
 
-def addLists(ls1: Iterable[float], ls2: Iterable[float]) -> Iterable[float]:
+def addLists(ls1: Iterable[float], ls2: Iterable[float]) -> List[float]:
     "Add the elements of `ls1` and `ls2` using `zipWith` and `add`"
     return zipWith(add)(ls1)(ls2)
 
@@ -203,8 +208,8 @@ def reduce(
          fn(x_1, x_0)))`
     """
 
-    def f(ls: Iterable[float]):
-        def g(ls: Iterable[float], acc: float):
+    def f(ls: Iterable[float]) -> float:
+        def g(ls: Iterable[float], acc: float) -> float:
             if ls == []:
                 return acc
             x, *xs = ls
