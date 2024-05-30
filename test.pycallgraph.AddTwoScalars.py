@@ -3,7 +3,7 @@ from pycallgraph.output import GraphvizOutput
 
 from minitorch import MathTest, Scalar, operators
 
-graphviz = GraphvizOutput(output_file="test.pycallgraph.png")
+graphviz = GraphvizOutput(output_file="test.pycallgraph.AddTwoScalars.png")
 
 with PyCallGraph(output=graphviz):
     t1, t2 = Scalar(5), Scalar(7)
