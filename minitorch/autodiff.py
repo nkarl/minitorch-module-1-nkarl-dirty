@@ -9,21 +9,23 @@ from typing_extensions import Protocol
 
 def central_difference(f: Any, *vals: Any, arg: int = 0, epsilon: float = 1e-6) -> Any:
     r"""
-    Computes an approximation to the derivative of `f` with respect to one arg.
+    Computes an _approximation_ to the derivative of `f` with respect to one arg.
 
     See :doc:`derivative` or https://en.wikipedia.org/wiki/Finite_difference for more details.
 
     Args:
-        f : arbitrary function from n-scalar args to one value
-        *vals : n-float values $x_0 \ldots x_{n-1}$
-        arg : the number $i$ of the arg to compute the derivative
-        epsilon : a small constant
+        f       : an arbitrary function that _reduces_ n-scalar args to one value
+        *vals   : a tensor of n-float values $x_0 \ldots x_{n-1}$
+        arg     : the number $i$ of the arg to compute the derivative
+        epsilon : a small stepsize constant $h$
 
     Returns:
         An approximation of $f'_i(x_0, \ldots, x_{n-1})$
     """
-    # TODO: Implement for Task 1.1.
-    raise NotImplementedError("Need to implement for Task 1.1")
+    right, left = [*vals], [*vals]
+    right[arg] += epsilon  # t[x+h]
+    left[arg] -= epsilon  # t[x-h]
+    return (f(*right) - f(*left)) / (2 * epsilon)
 
 
 variable_count = 1
@@ -38,7 +40,7 @@ class Variable(Protocol):
         pass
 
     def is_leaf(self) -> bool:
-        pass
+        return self.history.last_fn is None
 
     def is_constant(self) -> bool:
         pass
@@ -61,8 +63,21 @@ def topological_sort(variable: Variable) -> Iterable[Variable]:
     Returns:
         Non-constant Variables in topological order starting from the right.
     """
-    # TODO: Implement for Task 1.4.
-    raise NotImplementedError("Need to implement for Task 1.4")
+    map: List[Variable] = []
+    visited = set()
+
+    def map_from(var: Variable) -> None:
+        if var.unique_id in visited:
+            return
+        if not var.is_leaf():
+            for input in var.history.inputs:
+                if not Variable.is_constant(input):
+                    map_from(input)
+        visited.add(var.unique_id)
+        map.insert(0, var)
+
+    map_from(variable)
+    return map
 
 
 def backpropagate(variable: Variable, deriv: Any) -> None:
@@ -76,8 +91,25 @@ def backpropagate(variable: Variable, deriv: Any) -> None:
 
     No return. Should write to its results to the derivative values of each leaf through `accumulate_derivative`.
     """
+
     # TODO: Implement for Task 1.4.
-    raise NotImplementedError("Need to implement for Task 1.4")
+    remaining = [variable]
+
+    d = deriv
+    while len(remaining) > 0:
+        current = remaining.pop(0)
+
+        if current.history.is_leaf():
+            current.accumulate_derivative(d)
+        else:
+            terms = current.history.last_fn.chain_rule(
+                variable.history.ctx, variable.history.inputs, d
+            )
+            for each in terms:
+                remaining += [each]
+        pass
+    #
+    # NOTE: the variable info must be filled in, including the accumulated derivative.
 
 
 @dataclass

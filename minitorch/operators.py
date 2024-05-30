@@ -17,7 +17,7 @@ def mul(x: float, y: float) -> float:
 
 def id(x: float) -> float:
     "$f(x) = x$"
-    return x
+    return float(x)
 
 
 def add(x: float, y: float) -> float:
@@ -62,10 +62,17 @@ def sigmoid(x: float) -> float:
 
     for stability.
     """
-    if x >= 0:
-        return 1.0 / (1.0 + math.exp(neg(x)))
+    if x >= 0.0:
+        return 1.0 / (1.0 + exp(neg(x)))
     else:
-        return math.exp(x) / (1.0 + math.exp(x))
+        return exp(x) / (1.0 + exp(x))
+
+
+def sigmoid_back(x: float, d: float) -> float:
+    if x >= 0.0:
+        return d * (1.0 + exp(neg(x)))
+    else:
+        return d * (1.0 + exp(x))
 
 
 def relu(x: float) -> float:
@@ -74,7 +81,7 @@ def relu(x: float) -> float:
 
     (See https://en.wikipedia.org/wiki/Rectifier_(neural_networks) .)
     """
-    return x if x > 0 else 0
+    return id(x) if x > 0.0 else 0.0
 
 
 EPS = 1e-6
@@ -92,8 +99,8 @@ def exp(x: float) -> float:
 
 def log_back(x: float, d: float) -> float:
     r"If $f = log$ as above, compute $d \times f'(x)$"
-    df = inv(x)
-    return mul(d, df)
+    df = inv(x + EPS)
+    return mul(df, d)
 
 
 def inv(x: float) -> float:
@@ -104,13 +111,13 @@ def inv(x: float) -> float:
 def inv_back(x: float, d: float) -> float:
     r"If $f(x) = 1/x$ compute $d \times f'(x)$"
     df = neg(inv(mul(x, x)))
-    return mul(d, df)
+    return mul(df, d)
 
 
 def relu_back(x: float, d: float) -> float:
     r"If $f = relu$ compute $d \times f'(x)$"
     df = 0.0 if relu(x) == 0.0 else 1.0
-    return mul(d, df)
+    return mul(df, d)
 
 
 # ## Task 0.3
